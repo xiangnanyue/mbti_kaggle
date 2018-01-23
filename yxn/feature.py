@@ -24,8 +24,25 @@ from sklearn.preprocessing import OneHotEncoder, MaxAbsScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
+def clean_str(sentence, stem=True):
+    english_stopwords = set(
+        [stopword for stopword in stopwords.words('english')])
+    punctuation = set(string.punctuation)
+    punctuation.update(["``", "`", "..."])
+    if stem:
+        stemmer = SnowballStemmer('english')
+        return list((filter(lambda x: x.lower() not in english_stopwords and
+                            x.lower() not in punctuation,
+                            [stemmer.stem(t.lower())
+                             for t in word_tokenize(sentence)
+                             if t.isalpha()])))
+
+    return list((filter(lambda x: x.lower() not in english_stopwords and
+                        x.lower() not in punctuation,
+                        [t.lower() for t in word_tokenize(sentence)
+                         if t.isalpha()])))
+
 def clean_text(text, my_stopwords, punct, remove_stopwords=True, lower_case=True):
-    #print(text)
 
     if lower_case:
         text = text.lower()
@@ -159,6 +176,7 @@ def terms_to_graph(terms, w):
 
     return (g)
 
+
 class FeatureExtractor(TfidfVectorizer):
     """Convert a collection of raw documents to a matrix of TF-IDF features. """
 
@@ -186,13 +204,15 @@ class FeatureExtractor(TfidfVectorizer):
         """
         # deal with all the statements feature
         self._feat = np.array([' '.join(
-            clean_str(strip_accents_unicode(dd)))
-            for dd in X_df.statement])
+            clean_str(strip_accents_unicode(dd))) for dd in X_df.posts])
+
         super(FeatureExtractor, self).fit(self._feat)
+
         return self
 
     def fit_transform(self, X_df, y=None):
         self.fit(X_df)
+
         return self.transform(self.X_df)
 
     def transform(self, X_df):
@@ -201,6 +221,7 @@ class FeatureExtractor(TfidfVectorizer):
         #X = X_df[['source', 'researched_by']]
         check_is_fitted(self, '_feat', 'The tfidf vector is not fitted')
         X = super(FeatureExtractor, self).transform(X)
+
         return X.todense()
 
 
