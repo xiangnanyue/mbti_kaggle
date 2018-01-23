@@ -5,10 +5,9 @@ import numpy as np
 import rampwf as rw
 from datetime import timedelta
 
-problem_title = 'MBTI'
-_target_column_name = 'type'
-_prediction_label_dict = {}
-_prediction_label_names = [0, 1, 2, 3, 4, 5]
+problem_title = 'personality prediction'
+_target_column_name = 'personality'
+_prediction_label_names = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 # A type (class) which will be used to create wrapper objects for y_pred
 Predictions = rw.prediction_types.make_multiclass(
     label_names=_prediction_label_names)
@@ -16,23 +15,9 @@ Predictions = rw.prediction_types.make_multiclass(
 # An object implementing the workflow
 workflow = rw.workflows.FeatureExtractorClassifier()
 
-soft_score_matrix = np.array([
-    [1, 0.8, 0, 0, 0, 0],
-    [0.4, 1, 0.4, 0, 0, 0],
-    [0, 0.4, 1, 0.4, 0, 0],
-    [0, 0, 0.4, 1, 0.4, 0],
-    [0, 0, 0, 0.4, 1, 0.4],
-    [0, 0, 0, 0, 0.8, 1],
-])
+soft_score_matrix = np.identity(16)# to be changed
 
-true_false_score_matrix = np.array([
-    [1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 1],
-])
+true_false_score_matrix = np.identity(16)
 
 score_types = [
     rw.score_types.SoftAccuracy(
@@ -45,18 +30,23 @@ score_types = [
 
 def get_cv(X, y):
     """Slice folds by equal date intervals."""
-    date = pd.to_datetime(X['date'])
-    n_days = (date.max() - date.min()).days
+#     date = pd.to_datetime(X['date'])
+#     n_days = (date.max() - date.min()).days
     n_splits = 8
-    fold_length = n_days // n_splits
-    fold_dates = [date.min() + timedelta(days=i * fold_length)
-                  for i in range(n_splits + 1)]
+    fold_length = X.shape[0]/n_splits
+#     fold_dates = [date.min() + timedelta(days=i * fold_length)
+#                   for i in range(n_splits + 1)]
+#     for i in range(n_splits):
+#         test_is = (date >= fold_dates[i]) & (date < fold_dates[i + 1])
+#         train_is = ~test_is
+#         yield np.arange(len(date))[train_is], np.arange(len(date))[test_is]
+    arr = np.array(list(range(X.shape[0])))
+    np.random.shuffle(arr)
     for i in range(n_splits):
-        test_is = (date >= fold_dates[i]) & (date < fold_dates[i + 1])
-        train_is = ~test_is
-        yield np.arange(len(date))[train_is], np.arange(len(date))[test_is]
-
-
+        test = arr[int(i*fold_length):int((i+1)*fold_length)]
+        train = np.concatenate((arr[:int(i*fold_length)],arr[int((i+1)*fold_length):]))
+        print(arr[train], arr[test])
+        
 def _read_data(path, f_name):
     data = pd.read_csv(os.path.join(path, 'data', f_name), sep='\t')
     y_array = data[_target_column_name].values
@@ -76,3 +66,5 @@ def get_train_data(path='.'):
 def get_test_data(path='.'):
     f_name = 'test.csv'
     return _read_data(path, f_name)
+
+
