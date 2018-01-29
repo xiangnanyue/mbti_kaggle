@@ -217,7 +217,7 @@ class FeatureExtractor(TfidfVectorizer):
 
     def transform(self, X_df):
         X = np.array([' '.join(clean_str(strip_accents_unicode(dd)))
-                      for dd in X_df.statement])
+                      for dd in X_df.posts])
         #X = X_df[['source', 'researched_by']]
         check_is_fitted(self, '_feat', 'The tfidf vector is not fitted')
         X = super(FeatureExtractor, self).transform(X)
