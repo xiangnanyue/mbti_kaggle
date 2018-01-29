@@ -37,7 +37,6 @@ score_types = [
     rw.score_types.Accuracy(name='acc', precision=3),
     rw.score_types.SoftAccuracy(
         name='tfacc', score_matrix=true_false_score_matrix, precision=3),
-    rw.score_types.ROCAUC(name='ROC',precision=3,score_matrix=soft_score_matrix),
 ]
 
 
