@@ -63,7 +63,7 @@ def _read_data(path, f_name):
     if test:
         return X_df[:100], y_array[:100]
     else:
-        return X_df[:1000], y_array[:1000]
+        return X_df[:700], y_array[:700]
 
 
 def get_train_data(path='.'):
