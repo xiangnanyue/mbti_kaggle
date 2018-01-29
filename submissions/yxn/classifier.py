@@ -9,10 +9,10 @@ class Classifier(BaseEstimator):
 
     def fit(self, X, y):
         #print(y)
-        self.clf.fit(X.todense(), y)
+        self.clf.fit(X, y)
 
     def predict(self, X):
-        return self.clf.predict(X.todense())
+        return self.clf.predict(X)
 
     def predict_proba(self, X):
         #print(X.shape)
