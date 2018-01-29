@@ -26,9 +26,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 def clean_str(sentence, stem=True):
     english_stopwords = set(
-        [stopword for stopword in stopwords.words('english')])
+        [stopword for stopword in (stopwords.words('english')+["http","www"])])
     punctuation = set(string.punctuation)
-    punctuation.update(["``", "`", "..."])
+    punctuation.update(["``", "`", "...", "|||","://"])
     if stem:
         stemmer = SnowballStemmer('english')
         return list((filter(lambda x: x.lower() not in english_stopwords and
