@@ -7,7 +7,7 @@ from sklearn.svm import SVC
 class Classifier(BaseEstimator):
     def __init__(self):
         #self.clf = RandomForestClassifier()
-        self.clf = SVC(probability=True,class_weight='balanced')
+        self.clf = SVC(probability=True,class_weight='balanced',kernel='linear')
 
 
     def fit(self, X, y):
