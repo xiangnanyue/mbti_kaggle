@@ -12,7 +12,7 @@ import unicodedata
 import re
 import nltk
 import string
-import igraph
+import jgraph
 import itertools
 import unicodedata
 from nltk.corpus import stopwords
@@ -109,7 +109,7 @@ def stem_words(tokens):
 
 
 def terms_to_graph(terms, w):
-    '''This function returns a directed, weighted igraph from a list of terms
+    '''This function returns a directed, weighted jgraph from a list of terms
     (the tokens from the pre-processed text) e.g., ['quick','brown','fox'].
     Edges are weighted based on term co-occurence
     within a sliding window of fixed size 'w'.
@@ -160,7 +160,7 @@ def terms_to_graph(terms, w):
                     from_to[try_edge] = 1
 
     # create empty graph
-    g = igraph.Graph(directed=True)
+    g = jgraph.Graph(directed=True)
 
     # add vertices
     sorted_terms = sorted(set(terms))
@@ -217,7 +217,7 @@ class FeatureExtractor(TfidfVectorizer):
 
     def transform(self, X_df):
         X = np.array([' '.join(clean_str(strip_accents_unicode(dd)))
-                      for dd in X_df.statement])
+                      for dd in X_df.posts])
         #X = X_df[['source', 'researched_by']]
         check_is_fitted(self, '_feat', 'The tfidf vector is not fitted')
         X = super(FeatureExtractor, self).transform(X)
