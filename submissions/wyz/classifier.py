@@ -9,7 +9,7 @@ class Classifier(BaseEstimator):
     def __init__(self):
         #self.clf = RandomForestClassifier()
         #self.clf = SVC(probability=True,class_weight='balanced',kernel='linear')
-        self.clf = MLPClassifier()
+        self.clf = MLPClassifier(hidden_layer_sizes=(100, ), activation=’softmax’)
 
     def fit(self, X, y):
         #print(y)
