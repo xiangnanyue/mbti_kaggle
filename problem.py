@@ -38,7 +38,6 @@ score_types = [
     rw.score_types.SoftAccuracy(
         name='tfacc', score_matrix=true_false_score_matrix, precision=3),
     rw.score_types.ClassificationError(precision=3,name='clferr'),
-    rw.score_types.ROCAUC(precision=3),
 ]
 
 
