@@ -17,10 +17,20 @@ Predictions = rw.prediction_types.make_multiclass(
 # An object implementing the workflow
 workflow = rw.workflows.FeatureExtractorClassifier()
 
-soft_score_matrix = np.identity(16)# to be changed
+soft_score_matrix = np.identity(16)
+
+for i in dict:
+    for j in dict:
+        n = 0
+        for k in j:
+            if(k in i): n+=1
+        soft_score_matrix[dict[i]][dict[j]] = n / 4.
+        
 
 true_false_score_matrix = np.identity(16)
 
+
+        
 score_types = [
     rw.score_types.SoftAccuracy(
         name='sacc', score_matrix=soft_score_matrix, precision=3),
@@ -36,12 +46,6 @@ def get_cv(X, y):
 #     n_days = (date.max() - date.min()).days
     n_splits = 8
     fold_length = X.shape[0]/n_splits
-#     fold_dates = [date.min() + timedelta(days=i * fold_length)
-#                   for i in range(n_splits + 1)]
-#     for i in range(n_splits):
-#         test_is = (date >= fold_dates[i]) & (date < fold_dates[i + 1])
-#         train_is = ~test_is
-#         yield np.arange(len(date))[train_is], np.arange(len(date))[test_is]
     arr = np.array(list(range(X.shape[0])))
     np.random.shuffle(arr)
     for i in range(n_splits):
