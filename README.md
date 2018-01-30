@@ -1,4 +1,4 @@
-# RAMP starting kit on the
+# RAMP starting kit on the MBTI Prediction
 ## This is the Team Project for Data Camp Master 2 Data Science
 
 - A classification problem based on NLP.
