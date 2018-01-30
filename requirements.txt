@@ -1,0 +1,10 @@
+matplotlib (2.1.2)
+nltk (3.2.5)
+numpy (1.14.0)
+pandas (0.22.0)
+scikit-learn
+jupyter
+seaborn
+plotly
+missingno
+xgboost
