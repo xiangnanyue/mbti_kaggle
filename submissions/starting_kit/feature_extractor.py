@@ -1,34 +1,26 @@
-# the original codes
 # -*- coding: utf-8 -*-
-#from __future__ import unicode_literals
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
 import numpy as np
 import string
 import unicodedata
 import re
 import nltk
-import string
 import jgraph
 import itertools
-import unicodedata
 from nltk.corpus import stopwords
 from nltk import pos_tag
 from nltk import word_tokenize
 from nltk.stem import SnowballStemmer
 from sklearn.utils.validation import check_is_fitted
-from sklearn.preprocessing import OneHotEncoder, MaxAbsScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def clean_str(sentence, stem=True):
     english_stopwords = set(
-        [stopword for stopword in (stopwords.words('english')+["http","www"])])
+        [stopword for stopword in
+            (stopwords.words('english') + ["http", "www"])])
     punctuation = set(string.punctuation)
-    punctuation.update(["``", "`", "...", "|||","://"])
+    punctuation.update(["``", "`", "...", "|||", "://"])
     if stem:
         stemmer = SnowballStemmer('english')
         return list((filter(lambda x: x.lower() not in english_stopwords and
@@ -42,11 +34,15 @@ def clean_str(sentence, stem=True):
                         [t.lower() for t in word_tokenize(sentence)
                          if t.isalpha()])))
 
-def clean_text(text, my_stopwords, punct, remove_stopwords=True, lower_case=True):
+
+def clean_text(text, my_stopwords, punct,
+               remove_stopwords=True,
+               lower_case=True):
 
     if lower_case:
         text = text.lower()
-    text = ''.join(l for l in text if l not in punct)  # remove punctuation (preserving intra-word dashes)
+    # remove punctuation (preserving intra-word dashes)
+    text = ''.join(l for l in text if l not in punct)
     text = re.sub(' +', ' ', text)  # strip extra white space
     text = text.strip()  # strip leading and trailing white space
     # tokenize (split based on whitespace)
@@ -77,12 +73,12 @@ def pos_filter(tokens):
             item[1] == 'WDT' or
             item[1] == 'PRP' or
             item[1] == 'CD' or
-            item[1] == 'VBP' or # is are ..
+            item[1] == 'VBP' or  # is are ..
             item[1] == 'VB' or
             item[1] == 'VBZ' or
             item[1] == 'VBD' or
             item[1] == 'VBN' or
-            item[1] == 'RB' # verb
+            item[1] == 'RB'  # verb
         ):
             # keep some kinds of tags
             tokens_keep.append(item[0])
@@ -91,11 +87,13 @@ def pos_filter(tokens):
 
     return tokens, tagged_tokens
 
+
 def strip_accents_unicode(s):
     s = unicodedata.normalize('NFD', s)
     s = s.encode('ascii', 'ignore')
     s = s.decode("utf-8")
     return str(s)
+
 
 def stem_words(tokens):
     # apply Porter's stemmer
@@ -103,7 +101,7 @@ def stem_words(tokens):
     tokens_stemmed = list()
     for token in tokens:
         tokens_stemmed.append(stemmer.stem(token))
-    tokens = list(map(lambda x : strip_accents_unicode(x), tokens_stemmed))
+    tokens = list(map(lambda x: strip_accents_unicode(x), tokens_stemmed))
 
     return (tokens)
 
@@ -128,7 +126,7 @@ def terms_to_graph(terms, w):
     new_edges = []
 
     for my_tuple in indexes:
-        #print(my_tuple, terms_temp)
+        # print(my_tuple, terms_temp)
         new_edges.append(tuple([terms_temp[i] for i in my_tuple]))
 
     for new_edge in new_edges:
@@ -140,7 +138,8 @@ def terms_to_graph(terms, w):
     # then iterate over the remaining terms
     for i in range(w, len(terms)):
         considered_term = terms[i]  # term to consider
-        terms_temp = terms[(i - w + 1):(i + 1)]  # all terms within sliding window
+        # all terms within sliding window
+        terms_temp = terms[(i - w + 1):(i + 1)]
 
         # edges to try
         candidate_edges = []
@@ -155,7 +154,8 @@ def terms_to_graph(terms, w):
                 if try_edge in from_to:
                     from_to[try_edge] += 1
 
-                # if edge has never been seen, create it and assign it a unit weight
+                # if edge has never been seen,
+                # create it and assign it a unit weight
                 else:
                     from_to[try_edge] = 1
 
@@ -171,14 +171,16 @@ def terms_to_graph(terms, w):
     g.add_edges(from_to.keys())
 
     # set edge and vertex weights
-    g.es['weight'] = from_to.values()  # based on co-occurence within sliding window
-    #g.vs['weight'] = g.strength(weights=from_to.values())  # weighted degree
+    # based on co-occurence within sliding window
+    g.es['weight'] = from_to.values()
+    # g.vs['weight'] = g.strength(weights=from_to.values())
 
     return (g)
 
 
 class FeatureExtractor(TfidfVectorizer):
-    """Convert a collection of raw documents to a matrix of TF-IDF features. """
+    """Convert a collection of raw documents to
+    a matrix of TF-IDF features. """
 
     def __init__(self):
         super(FeatureExtractor, self).__init__(
@@ -218,12 +220,7 @@ class FeatureExtractor(TfidfVectorizer):
     def transform(self, X_df):
         X = np.array([' '.join(clean_str(strip_accents_unicode(dd)))
                       for dd in X_df.posts])
-        #X = X_df[['source', 'researched_by']]
         check_is_fitted(self, '_feat', 'The tfidf vector is not fitted')
         X = super(FeatureExtractor, self).transform(X)
 
         return X.todense()
-
-
-
-
